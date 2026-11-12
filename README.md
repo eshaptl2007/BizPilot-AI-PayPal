@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # BizPilot AI: your autonomous business growth partner
 
 > **Don't just manage your business. Know exactly what to do next.**
@@ -191,6 +191,4 @@ Competitor intelligence · AI-generated posters · campaign scheduling · custom
 ## License
 
 [MIT](LICENSE)
-=======
-# BizPilot-AI
->>>>>>> 9cb8ff441d03abcaa22208f0e875a9ad5f8b8722
+
