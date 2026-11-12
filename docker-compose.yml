@@ -1,0 +1,40 @@
+# One command demo:  docker compose up --build
+#   App:        http://localhost:5173      (login demo@bizpilot.ai / Demo@1234)
+#   Storefront: http://localhost:5173/shop/sweet-crumbs
+#   API:        http://localhost:4000/api/health
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bizpilot
+      POSTGRES_PASSWORD: bizpilot
+      POSTGRES_DB: bizpilot
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bizpilot"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    depends_on: { db: { condition: service_healthy } }
+    env_file: [{ path: .env, required: false }]
+    environment:
+      DATABASE_URL: postgres://bizpilot:bizpilot@db:5432/bizpilot
+      CLIENT_ORIGIN: http://localhost:5173
+      PUBLIC_CLIENT_URL: http://localhost:5173
+      NODE_ENV: ${NODE_ENV:-development}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me}
+    ports: ["4000:4000"]
+    # applies migrations, loads the demo bakery (skipped if already present), then starts the API
+    command: sh -c "node src/db/migrate.js --seed && node src/server.js"
+
+  frontend:
+    build: { context: frontend }
+    depends_on: [backend]
+    ports: ["5173:80"]
+
+volumes:
+  pgdata:

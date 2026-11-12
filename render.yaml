@@ -1,0 +1,38 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Deploys Postgres + API + static frontend. Fill the `sync: false` secrets in the Render dashboard.
+databases:
+  - name: bizpilot-db
+    plan: free
+    databaseName: bizpilot
+    user: bizpilot
+
+services:
+  - type: web
+    name: bizpilot-api
+    runtime: node
+    rootDir: .
+    buildCommand: cd backend && npm install --omit=dev
+    startCommand: cd backend && node src/db/migrate.js --seed && node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - { key: NODE_ENV, value: production }
+      - { key: DATABASE_URL, fromDatabase: { name: bizpilot-db, property: connectionString } }
+      - { key: JWT_SECRET, generateValue: true }
+      - { key: CLIENT_ORIGIN, sync: false }        # e.g. https://bizpilot-web.onrender.com
+      - { key: PUBLIC_CLIENT_URL, sync: false }    # same value
+      - { key: PAYPAL_CLIENT_ID, sync: false }
+      - { key: PAYPAL_CLIENT_SECRET, sync: false }
+      - { key: PAYPAL_WEBHOOK_ID, sync: false }
+      - { key: PAYPAL_MODE, value: sandbox }
+      - { key: ANTHROPIC_API_KEY, sync: false }
+
+  - type: web
+    name: bizpilot-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - { key: VITE_API_URL, sync: false }         # e.g. https://bizpilot-api.onrender.com
+    routes:
+      - { type: rewrite, source: /*, destination: /index.html }

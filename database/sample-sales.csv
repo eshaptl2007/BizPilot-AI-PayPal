@@ -1,0 +1,7 @@
+date,product,quantity,unit_price,order_id
+2026-10-20,Croissant,2,3.50,A100
+2026-10-20,Sourdough Loaf,1,6.50,A100
+2026-10-21,Baguette,3,,A101
+2026-10-21,Custom Celebration Cake,1,42.00,A102
+2026-10-22,Cinnamon Roll,2,3.20,A103
+2026-10-22,Unknown Product,1,5.00,A104
